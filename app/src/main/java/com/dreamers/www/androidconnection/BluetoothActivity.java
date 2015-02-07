@@ -261,6 +261,7 @@ public class BluetoothActivity extends Activity {
             }
             bluetoothSocket = temp;
         }
+        //just a test
 
         public void run() {
             //cancel any discovery as it will slow down the connection
