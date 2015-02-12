@@ -20,6 +20,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -85,6 +86,17 @@ public class BluetoothActivity extends Activity {
             toggleButton.setChecked(false);
         } else {
             if(toggleButton.isChecked()) { //to turn on bluetooth
+
+                Set<BluetoothDevice> pairedDevice = bluetoothAdapter.getBondedDevices();
+                //If there are paired devices
+                if (pairedDevice.size() > 0) {
+                    //Loop through paired device
+                    for(BluetoothDevice device : pairedDevice) {
+                        //Add the name and address to an array adapter to show in a ListView
+                        adapter.add(device.getName() + "\n" + device.getAddress());
+                    }
+                }
+
                 if(!bluetoothAdapter.isEnabled()) {
                     //A dialog will appear requesting user permission to enable Bluetooth
                     Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -105,34 +117,14 @@ public class BluetoothActivity extends Activity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_bluetooth, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == ENABLE_BT_REQUEST_CODE) {
             //Bluetooth successfully enabled!
             if(resultCode == Activity.RESULT_OK) {
                 Toast.makeText(getApplicationContext(), "Ha! Bluetooth has been enabled." +
                         "\n" + "Scanning for Remote Bluetooth devices...", Toast.LENGTH_SHORT).show();
+
+
 
                 //To discover remote Bluetooth devices
                 discoverDevices();
@@ -153,11 +145,32 @@ public class BluetoothActivity extends Activity {
         } else if (requestCode == DISCOVERABLE_BT_REQUEST_CODE) {
             if(resultCode == DISCOVERABLE_DURATION) {
                 Toast.makeText(getApplicationContext(),"Your device is now discoverable by other device for "
-                + DISCOVERABLE_DURATION + " seconds", Toast.LENGTH_SHORT).show();
+                        + DISCOVERABLE_DURATION + " seconds", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(getApplicationContext(),"Fail to enable discoverability on your device ", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_bluetooth, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     protected void makeDiscoverable() {
